@@ -15,7 +15,7 @@ const Leg = ({ leg, displayTime }: Props) => {
     <div className="mb-2 rounded-md border border-solid border-slate-500 p-2 text-sm">
       <div className="flex justify-between">
         <span className="whitespace-normal">{leg?.from?.name}</span>
-        <span className="text-slate-600">
+        <span className="self-center text-slate-600">
           {leg.startTime && displayTime(leg.startTime ?? "")}
         </span>
       </div>

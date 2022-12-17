@@ -1,16 +1,21 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState } from "react";
 import "./App.css";
-import Itinerary from "./components/Itinerary/Itinerary";
 import { operations, components } from "./bkk-openapi";
 import Destination from "./components/Destination/Destination";
-import { MdDirections } from "react-icons/md";
+import {
+  MdOutlineMyLocation,
+  MdOutlineLocationOn,
+  MdLocationPin,
+} from "react-icons/md";
+import ItinerariesView from "./components/ItinerariesView";
+import addresses from "./data/addresses";
 
 function App() {
   const tripUrl =
     "https://futar.bkk.hu/api/query/v1/ws/otp/api/where/plan-trip.json?";
-  const stopDataUrl =
-    "https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?";
+  // const stopDataUrl =
+  //   "https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?";
 
   const [itineraries, setItineraries] = useState<
     components["schemas"]["Itinerary"][]
@@ -23,70 +28,40 @@ function App() {
     toPlace: "47.506569,19.089396",
     mode: ["TRANSIT", "WALK"],
     includeReferences: ["false"],
+    numItineraries: 4,
   });
-  const [stopParams, setStopParams] = useState<
-    operations["getArrivalsAndDeparturesForStop"]["parameters"]["query"]
-  >({
-    stopId: ["BKK_F03845"],
-    onlyDepartures: true,
-    limit: 10,
-    minutesBefore: 0,
-    minutesAfter: 10,
-  });
-  // const [error, setError] = useState(null);
+  // const [stopParams, setStopParams] = useState<
+  //   operations["getArrivalsAndDeparturesForStop"]["parameters"]["query"]
+  // >({
+  //   stopId: ["BKK_F03845"],
+  //   onlyDepartures: true,
+  //   limit: 10,
+  //   minutesBefore: 0,
+  //   minutesAfter: 10,
+  // });
+  const [accuracy, setAccuracy] = useState("");
 
-  const addresses = [
-    {
-      label: "Radnóti",
-      coordinates: "47.506569,19.089396",
-    },
-    {
-      label: "Párbeszéd Háza",
-      coordinates: "47.491038,19.067816",
-    },
-    {
-      label: "ELTE BTK",
-      coordinates: "47.493322,19.060746",
-    },
-    {
-      label: "Home",
-      coordinates: "47.45274985878205,19.183336490556123",
-    },
-    {
-      label: "MOMKult",
-      coordinates: "47.49021136525273,19.018491865474658",
-    },
-  ];
-
-  function getData() {
-    async function fetchTrip() {
-      const tripResponse = await fetch(
-        // TODO find a better solution to this type issue
-        tripUrl + new URLSearchParams(tripParams as any).toString()
-      );
-      const tripData = await tripResponse
-        .json()
-        .then((d: components["schemas"]["PlanTripResponse"]) => {
-          if (d.code !== 200) {
-            console.log(d?.data?.entry?.error);
-            throw new Error(d.status);
-          }
-          return d.data;
-        });
-      return tripData;
-    }
-
-    fetchTrip()
+  function getData(destinationCoordinates: string): void {
+    setLoading(true);
+    const params = { ...tripParams, ["toPlace"]: destinationCoordinates };
+    fetch(
+      // TODO find a better solution to this type issue
+      tripUrl + new URLSearchParams(params as any).toString()
+    )
+      .then((response) => response.json())
+      .then((d: components["schemas"]["PlanTripResponse"]) => {
+        if (d.code !== 200) {
+          console.log(d?.data?.entry?.error);
+          throw new Error(d.status);
+        }
+        return d.data;
+      })
       .then((tripData) => {
-        setLoading(false);
         setItineraries(tripData?.entry?.plan?.itineraries ?? []);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   }
-
-  const handleDestinationChange = (coordinates: string) => {
-    setTripParams({ ...tripParams, ["toPlace"]: coordinates });
-  };
 
   const setDepartToCurrentLoc = () => {
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -97,40 +72,55 @@ function App() {
           "," +
           pos.coords.longitude.toString(),
       });
-      console.log(pos.coords.accuracy);
+      setAccuracy(pos.coords.accuracy.toFixed(0));
     });
   };
 
   return (
-    <div className="align-middle">
-      <button
-        onClick={() => setDepartToCurrentLoc()}
-        className="border border-solid border-slate-500 p-1 hover:bg-slate-300"
-      >
-        Set current location as start
-      </button>
-      <div className="my-1">
-        {addresses.map((destination) => (
-          <Destination
-            key={destination.coordinates}
-            label={destination.label}
-            coordinates={destination.coordinates}
-            handleDestinationChange={handleDestinationChange}
-          />
-        ))}
+    <div className="">
+      <div className="m-4 rounded bg-slate-50 p-2">
+        <div className="mx-4 my-2 flex flex-row ">
+          <div className="text-md mr-8 inline-flex self-center">
+            <MdOutlineLocationOn className="h-8 w-8" />
+          </div>
+          <button
+            onClick={() => setDepartToCurrentLoc()}
+            className=" flex items-center border border-solid border-slate-500 p-2 hover:bg-slate-300"
+          >
+            <MdOutlineMyLocation className="mr-2 inline-flex h-4 w-4" />
+            Current location
+          </button>
+          {accuracy && (
+            <div className="ml-4 inline-flex self-center text-xs text-slate-500">
+              Accurate to {accuracy} meters
+            </div>
+          )}
+        </div>
+        <div className="mx-4 my-2 flex flex-row flex-nowrap">
+          <div className="text-md my-auto mr-8 inline-flex">
+            <MdLocationPin className="h-8 w-8" />
+          </div>
+          <div className="my-1 flex flex-row flex-wrap gap-2">
+            {addresses.map((destination) => (
+              <Destination
+                key={destination.coordinates}
+                label={destination.label}
+                coordinates={destination.coordinates}
+                getData={getData}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-      <button
-        className="border border-solid border-slate-500 p-1 text-2xl hover:bg-slate-300"
+      {/* <button
+        className="mx-auto ml-8 w-40 justify-self-center rounded border bg-slate-300 p-3 hover:bg-slate-400"
         onClick={() => getData()}
       >
-        <MdDirections />
-      </button>
+        <MdDirections className="inline-block text-2xl" /> Plan trip
+      </button> */}
       {loading && <p>Loading...</p>}
-      <div className="m-4 flex flex-wrap p-3">
-        {!loading &&
-          itineraries.map((itinerary) => (
-            <Itinerary itinerary={itinerary} key={itinerary.duration} />
-          ))}
+      <div>
+        <ItinerariesView loading={loading} itineraries={itineraries} />
       </div>
     </div>
   );

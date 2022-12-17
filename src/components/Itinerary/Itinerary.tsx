@@ -6,9 +6,10 @@ import { MdDirectionsWalk } from "react-icons/md";
 
 interface Props {
   itinerary: components["schemas"]["Itinerary"];
+  isExpanded: boolean;
+  onExpand: () => void;
 }
-const Itinerary = ({ itinerary }: Props) => {
-  const expanded = true;
+const Itinerary = ({ itinerary, isExpanded, onExpand }: Props) => {
   function displayTime(date: string): string {
     if (date) {
       return new Date(date).toLocaleTimeString("hu", {
@@ -18,8 +19,8 @@ const Itinerary = ({ itinerary }: Props) => {
     } else return "";
   }
   return (
-    <div className="m-2 h-auto max-w-xs rounded-md bg-slate-100 p-4">
-      <div className="mb-4">
+    <div className="m-2 h-fit w-full rounded-md bg-slate-100 p-4 sm:w-64">
+      <div className="mb-4" onClick={onExpand}>
         <div className="flex justify-between pb-1">
           <span className="">
             {displayTime(itinerary.startTime as string)} -{" "}
@@ -44,7 +45,7 @@ const Itinerary = ({ itinerary }: Props) => {
           {itinerary.walkDistance?.toFixed(0)} m
         </div>
       </div>
-      {expanded && (
+      {isExpanded && (
         <div className="">
           {itinerary.legs?.map((leg) => (
             <Leg leg={leg} displayTime={displayTime} key={leg.startTime} />
