@@ -1,5 +1,9 @@
 const addresses = [
   {
+    label: "Home",
+    coordinates: "47.45274985878205,19.183336490556123",
+  },
+  {
     label: "Radnóti",
     coordinates: "47.506569,19.089396",
   },
@@ -12,12 +16,8 @@ const addresses = [
     coordinates: "47.493322,19.060746",
   },
   {
-    label: "Home",
-    coordinates: "47.45274985878205,19.183336490556123",
-  },
-  {
-    label: "MOMKult",
-    coordinates: "47.49021136525273,19.018491865474658",
+    label: "Samuék",
+    coordinates: "47.48312876260617,19.04099569659337",
   },
 ];
 

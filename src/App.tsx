@@ -44,6 +44,7 @@ function App() {
   function getData(destinationCoordinates: string): void {
     setLoading(true);
     const params = { ...tripParams, ["toPlace"]: destinationCoordinates };
+    // TODO custom hook?
     fetch(
       // TODO find a better solution to this type issue
       tripUrl + new URLSearchParams(params as any).toString()
