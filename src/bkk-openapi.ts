@@ -131,7 +131,7 @@ export interface components {
       /** @description Menetek referenciáinak listája. */
       trips?: components["schemas"]["TransitTrip"][];
       /** @description Zavarok referenciáinak listája. */
-      alerts?: components["schemas"]["TransitAlert"][];
+      // alerts?: components["schemas"]["TransitAlert"][];
     };
     OTPTransitReferences: {
       /** @description Szolgáltatók referenciáinak listája. */
@@ -304,9 +304,8 @@ export interface components {
       class?: string;
     };
     /** @description A válaszhoz tartozó referenciák. */
-    TransitReferences:
-      | components["schemas"]["OTPTransitReferences"]
-      | components["schemas"]["MobileTransitReferences"];
+    TransitReferences: components["schemas"]["OTPTransitReferences"];
+    // | components["schemas"]["MobileTransitReferences"];
     /** @description Járatok referenciáinak listája. */
     TransitRoute: {
       /**

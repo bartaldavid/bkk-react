@@ -6,9 +6,16 @@ import { useState } from "react";
 interface Props {
   loading: boolean;
   itineraries: components["schemas"]["Itinerary"][];
+  alerts?: {
+    [key: string]: components["schemas"]["TransitAlert"] | undefined;
+  };
 }
 
-const ItinerariesView = ({ loading, itineraries }: Props): JSX.Element => {
+const ItinerariesView = ({
+  loading,
+  itineraries,
+  alerts,
+}: Props): JSX.Element => {
   const [expandedId, setExpandedId] = useState(0);
   return (
     <div className="m-4 flex flex-wrap p-3">
@@ -25,6 +32,7 @@ const ItinerariesView = ({ loading, itineraries }: Props): JSX.Element => {
                 setExpandedId(0);
               }
             }}
+            alerts={alerts}
           />
         ))}
     </div>

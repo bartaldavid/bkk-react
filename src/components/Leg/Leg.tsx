@@ -1,12 +1,16 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { components } from "../../bkk-openapi";
+import { MdWarning } from "react-icons/md";
 
 interface Props {
   leg: components["schemas"]["Leg"];
   displayTime: (date: string) => string;
+  alerts?: {
+    [key: string]: components["schemas"]["TransitAlert"] | undefined;
+  };
 }
 
-const Leg = ({ leg, displayTime }: Props) => {
+const Leg = ({ leg, displayTime, alerts }: Props) => {
   const legStyle = {
     backgroundColor: "#" + leg.routeColor,
     color: "#" + leg.routeTextColor,
@@ -29,6 +33,17 @@ const Leg = ({ leg, displayTime }: Props) => {
           {!leg.transitLeg && "(" + leg.distance?.toFixed() + " m)"}
         </span>
       </div>
+      {leg.hasAlertInPattern && alerts && (
+        <div className="my-2 ml-1 flex flex-row align-middle text-red-700">
+          <MdWarning className="mr-2 inline-flex self-center" />
+          <div className="text-xs">
+            {leg.alertIds?.map(
+              (currentAlertId) =>
+                alerts[currentAlertId]?.header?.someTranslation
+            ) ?? ""}
+          </div>
+        </div>
+      )}
       <div className="flex justify-between">
         <span>{leg?.to?.name}</span>
         <span className="text-slate-600">

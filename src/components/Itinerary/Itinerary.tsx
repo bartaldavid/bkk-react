@@ -8,8 +8,11 @@ interface Props {
   itinerary: components["schemas"]["Itinerary"];
   isExpanded: boolean;
   onExpand: () => void;
+  alerts?: {
+    [key: string]: components["schemas"]["TransitAlert"] | undefined;
+  };
 }
-const Itinerary = ({ itinerary, isExpanded, onExpand }: Props) => {
+const Itinerary = ({ itinerary, isExpanded, onExpand, alerts }: Props) => {
   function displayTime(date: string): string {
     if (date) {
       return new Date(date).toLocaleTimeString("hu", {
@@ -48,7 +51,12 @@ const Itinerary = ({ itinerary, isExpanded, onExpand }: Props) => {
       {isExpanded && (
         <div className="">
           {itinerary.legs?.map((leg) => (
-            <Leg leg={leg} displayTime={displayTime} key={leg.startTime} />
+            <Leg
+              leg={leg}
+              displayTime={displayTime}
+              key={leg.startTime}
+              alerts={alerts}
+            />
           ))}
         </div>
       )}
