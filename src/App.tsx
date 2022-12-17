@@ -64,16 +64,19 @@ function App() {
   }
 
   const setDepartToCurrentLoc = () => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      setTripParams({
-        ...tripParams,
-        ["fromPlace"]:
-          pos.coords.latitude.toString() +
-          "," +
-          pos.coords.longitude.toString(),
-      });
-      setAccuracy(pos.coords.accuracy.toFixed(0));
-    });
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setTripParams({
+          ...tripParams,
+          ["fromPlace"]:
+            pos.coords.latitude.toString() +
+            "," +
+            pos.coords.longitude.toString(),
+        });
+        setAccuracy(pos.coords.accuracy.toFixed(0));
+      },
+      (error) => setAccuracy(error.toString())
+    );
   };
 
   return (
