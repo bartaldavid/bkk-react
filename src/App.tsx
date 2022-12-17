@@ -75,7 +75,7 @@ function App() {
         });
         setAccuracy(pos.coords.accuracy.toFixed(0));
       },
-      (error) => setAccuracy(JSON.stringify(error))
+      (error) => setAccuracy(error.message)
     );
   };
 
