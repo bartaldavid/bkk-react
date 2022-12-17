@@ -8,22 +8,26 @@ interface Props {
   itinerary: components["schemas"]["Itinerary"];
 }
 const Itinerary = ({ itinerary }: Props) => {
-  function displayTime(date: string) {
-    if (date)
+  const expanded = true;
+  function displayTime(date: string): string {
+    if (date) {
       return new Date(date).toLocaleTimeString("hu", {
         hour: "2-digit",
         minute: "2-digit",
       });
+    } else return "";
   }
   return (
     <div className="m-2 h-auto max-w-xs rounded-md bg-slate-100 p-4">
       <div className="mb-4">
-        <div className="flex justify-between">
+        <div className="flex justify-between pb-1">
           <span className="">
             {displayTime(itinerary.startTime as string)} -{" "}
             {displayTime(itinerary.endTime as string)}{" "}
           </span>
-          <span>{(itinerary.duration / 60).toFixed(0)} min</span>
+          <span>
+            {itinerary.duration && (itinerary.duration / 60).toFixed(0)} min
+          </span>
         </div>
         {itinerary.patternFrequency ? (
           <div className="text-sm">
@@ -36,15 +40,17 @@ const Itinerary = ({ itinerary }: Props) => {
 
         <div className="flex flex-row align-baseline text-sm">
           <MdDirectionsWalk />
-          {(itinerary.walkTime / 60).toFixed(0)} min{", "}
+          {itinerary.walkTime && (itinerary.walkTime / 60).toFixed(0)} min{", "}
           {itinerary.walkDistance?.toFixed(0)} m
         </div>
       </div>
-      <div className="">
-        {itinerary.legs?.map((leg) => (
-          <Leg leg={leg} displayTime={displayTime} key={leg.startTime} />
-        ))}
-      </div>
+      {expanded && (
+        <div className="">
+          {itinerary.legs?.map((leg) => (
+            <Leg leg={leg} displayTime={displayTime} key={leg.startTime} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

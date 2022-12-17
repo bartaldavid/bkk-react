@@ -4,12 +4,18 @@ import "./App.css";
 import Itinerary from "./components/Itinerary/Itinerary";
 import { operations, components } from "./bkk-openapi";
 import Destination from "./components/Destination/Destination";
+import { MdDirections } from "react-icons/md";
 
 function App() {
+  const tripUrl =
+    "https://futar.bkk.hu/api/query/v1/ws/otp/api/where/plan-trip.json?";
+  const stopDataUrl =
+    "https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?";
+
   const [itineraries, setItineraries] = useState<
     components["schemas"]["Itinerary"][]
   >([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [tripParams, setTripParams] = useState<
     operations["plan"]["parameters"]["query"]
   >({
@@ -18,9 +24,18 @@ function App() {
     mode: ["TRANSIT", "WALK"],
     includeReferences: ["false"],
   });
+  const [stopParams, setStopParams] = useState<
+    operations["getArrivalsAndDeparturesForStop"]["parameters"]["query"]
+  >({
+    stopId: ["BKK_F03845"],
+    onlyDepartures: true,
+    limit: 10,
+    minutesBefore: 0,
+    minutesAfter: 10,
+  });
   // const [error, setError] = useState(null);
 
-  const destinations = [
+  const addresses = [
     {
       label: "Radnóti",
       coordinates: "47.506569,19.089396",
@@ -33,15 +48,21 @@ function App() {
       label: "ELTE BTK",
       coordinates: "47.493322,19.060746",
     },
+    {
+      label: "Home",
+      coordinates: "47.45274985878205,19.183336490556123",
+    },
+    {
+      label: "MOMKult",
+      coordinates: "47.49021136525273,19.018491865474658",
+    },
   ];
-
-  const tripUrl =
-    "https://futar.bkk.hu/api/query/v1/ws/otp/api/where/plan-trip.json?";
 
   function getData() {
     async function fetchTrip() {
       const tripResponse = await fetch(
-        tripUrl + new URLSearchParams(tripParams).toString()
+        // TODO find a better solution to this type issue
+        tripUrl + new URLSearchParams(tripParams as any).toString()
       );
       const tripData = await tripResponse
         .json()
@@ -58,9 +79,7 @@ function App() {
     fetchTrip()
       .then((tripData) => {
         setLoading(false);
-        // console.log(tripData.entry.plan);
         setItineraries(tripData?.entry?.plan?.itineraries ?? []);
-        // console.log(itineraries);
       })
       .catch((err) => console.log(err));
   }
@@ -91,7 +110,7 @@ function App() {
         Set current location as start
       </button>
       <div className="my-1">
-        {destinations.map((destination) => (
+        {addresses.map((destination) => (
           <Destination
             key={destination.coordinates}
             label={destination.label}
@@ -101,11 +120,12 @@ function App() {
         ))}
       </div>
       <button
-        className="border border-solid border-slate-500 p-1 hover:bg-slate-300"
+        className="border border-solid border-slate-500 p-1 text-2xl hover:bg-slate-300"
         onClick={() => getData()}
       >
-        Fetch data
+        <MdDirections />
       </button>
+      {loading && <p>Loading...</p>}
       <div className="m-4 flex flex-wrap p-3">
         {!loading &&
           itineraries.map((itinerary) => (
