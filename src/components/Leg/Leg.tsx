@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { components } from "../../bkk-openapi";
-import { MdWarning } from "react-icons/md";
+import { MdDirectionsWalk, MdWarning } from "react-icons/md";
 
 interface Props {
   leg: components["schemas"]["Leg"];
@@ -16,7 +16,11 @@ const Leg = ({ leg, displayTime, alerts }: Props) => {
     color: "#" + leg.routeTextColor,
   };
   return (
-    <div className="mb-2 rounded-md border border-solid border-slate-500 p-2 text-sm">
+    <div
+      className={`mb-2 rounded-md ${
+        leg.transitLeg && "border border-solid border-slate-500"
+      } p-2 text-sm`}
+    >
       <div className="flex justify-between">
         <span className="whitespace-normal">{leg?.from?.name}</span>
         <span className="self-center text-slate-600">
@@ -25,7 +29,12 @@ const Leg = ({ leg, displayTime, alerts }: Props) => {
       </div>
       <div className="my-1">
         <span style={legStyle} className="inline-block rounded-md p-1 text-xs">
-          {leg.mode} {leg.transitLeg && leg.routeShortName}{" "}
+          {leg.transitLeg ? (
+            leg.mode
+          ) : (
+            <MdDirectionsWalk className="inline h-4 w-4 align-bottom text-sm" />
+          )}{" "}
+          {leg.transitLeg && leg.routeShortName}{" "}
         </span>
         <span className="text-xs">
           {" "}
